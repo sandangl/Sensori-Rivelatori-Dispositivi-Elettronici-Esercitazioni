@@ -1,0 +1,617 @@
+\chapter{Progetto di trasduttori piezoelettrici in MATLAB}
+\label{chap:trasduttori_matlab}
+
+\section{Caratterizzazione dell'elemento piezoelettrico nel modo thickness}
+\label{sec:thickness_mode}
+
+Esistono delle geometrie per le quali è possibile assumere che, in un range di frequenze, esista un solo modo di vibrazione e che questo abbia un'unica direzione di propagazione; ad esempio, l'onda si propaga nella direzione $z$ ed è indipendente dalle variabili $x$ e $y$. Affinché ciò sia possibile la dimensione fisica corrispondente alla direzione di propagazione deve essere molto diversa (maggiore o minore) dalle altre due. Questa assunzione porta ad identificare alcune geometrie monodimensionali per le quali è possibile ricavare il modello matematico.
+
+Considerando una ceramica piezoelettrica, avente lunghezza $L$, larghezza $w$ e spessore $l$ e tale per cui $L$ e $w$ siano molto maggiori di $l$ ($L, w \gg l$). La ceramica è polarizzata nella direzione $z$ e le facce ortogonali a tale direzione sono metallizzate. Ai capi degli elettrodi è applicata una tensione sinusoidale $V$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/placeholder.jpg}
+    \caption{Geometria dell'elemento piezoelettrico che oscilla nel modo thickness.}
+    \label{fig:geometria_thickness}
+\end{figure}
+
+Esistono principalmente due differenti tipologie di ceramiche piezoelettriche classificabili in base alla tipologia del drogaggio e alla mobilità dei domini ferroelettrici \cite{americanpiezo, ferroperm}:
+\begin{itemize}
+    \item \textbf{Soft}: con drogaggi donatori che favoriscono la mobilità dei domini; in media si ottengono alta sensibilità ($d_{33}$ elevato), alti fattori di accoppiamento, permittività più alta ma perdite dielettriche maggiori. Più facili da polarizzare ma anche più suscettibili a depolarizzazione e a limiti di frequenza. Ambiti applicativi tipici sono quelli in cui servono sensibilità e spostamento: sensori (accelerometri, microfoni/trasduttori elettroacustici), attuatori a bassa potenza.
+    \item \textbf{Hard}: con drogaggi accettori che ``bloccano'' i domini; in media perdite basse, stabilità sotto carichi meccanici/elettrici elevati, ma $d_{33}$ più basso e spostamenti inferiori a parità di campo. Più difficili da polarizzare ma più stabili in potenza. Ambiti applicativi tipici sono quelli in cui servono alta potenza e bassa perdita: saldatura ultrasonica, pulizia ultrasonica, terapia, sonar e trasduttori in risonanza con auto riscaldamento ridotto.
+\end{itemize}
+
+Considerando una ceramica piezoelettrica soft, avente:
+\begin{itemize}
+    \item Densità volumetrica del materiale $\rho$;
+    \item Costante di rigidezza elastica $c_{33}$;
+    \item Costante di rigidezza piezoelettrica $h_{33}$;
+    \item Costante di stress piezoelettrica $e_{33}$;
+    \item Costante di impermeabilità dielettrica $\beta_{33}$.
+\end{itemize}
+
+Dove il primo pedice indica la direzione della componente che vale 3 e corrisponde alla direzione dell'asse $z$ nella presente notazione, mentre il secondo pedice indica la normale della superficie orientata sempre valente 3 e corrispondente a $z$.
+
+In questa condizione nel materiale si propagano delle onde elastiche la cui velocità è calcolabile come segue:
+\begin{equation}
+    v = \sqrt{\frac{c_{33}}{\rho}}
+    \label{eq:velocita_onde}
+\end{equation}
+
+Tali onde avranno invece una fase detta ``fase di spessore'' o ``lunghezza elettrica'' definita come segue:
+\begin{equation}
+    \theta = \frac{\omega l}{v}
+    \label{eq:fase_spessore}
+\end{equation}
+Dove con $\omega$ è stata indicata la pulsazione ricavabile agevolmente dalla frequenza.
+
+La frequenza alla quale nell'elemento piezoceramico si stabilisce un'onda stazionaria compatibile con le condizioni ai bordi del pezzo è detta frequenza di risonanza meccanica dell'elemento. Per il modo fondamentale tale frequenza è così definita:
+\begin{equation}
+    f_r \approx \frac{v}{2l}
+    \label{eq:frequenza_risonanza}
+\end{equation}
+
+Un parametro molto importante per riassumere e caratterizzare tale elemento piezoceramico a vuoto, ovvero meccanicamente isolato, è l'impedenza d'ingresso dell'elemento. Tale impedenza, come è possibile dimostrare, è calcolabile come segue:
+\begin{equation}
+    Z_{in} = \frac{1}{j \omega C_0} \left[ 1 - \frac{h_{33}^2}{c_{33}\beta_{33}} \frac{2}{\theta} \tan\left(\frac{\theta}{2}\right) \right]
+    \label{eq:impedenza_ingresso_vuoto}
+\end{equation}
+Dove:
+\begin{equation}
+    C_0 = \frac{L w}{\beta_{33} l}
+    \label{eq:capacita_statica}
+\end{equation}
+è la cosiddetta capacità statica della ceramica.
+
+Come è possibile osservare \cref{eq:impedenza_ingresso_vuoto} presenta soltanto parametri noti della ceramica o calcolabili con le \cref{eq:velocita_onde,eq:fase_spessore,eq:frequenza_risonanza}; di conseguenza data la precedente base teorica l'implementazione atta a simulare numericamente il comportamento della funzione $Z_{in}$ risulta banale. Inoltre l'implementazione segue pedissequamente quanto visto teoricamente e non presenta scelte implementative degne di essere trattate.
+
+Di seguito vengono riportati i grafici del modulo e della fase dell'impedenza di ingresso della ceramica piezoelettrica avente seguenti caratteristiche: geometria delle facce circolare, $r = 10e^{-3}\,\text{m}$, $l = 2.01e^{-3}\,\text{m}$, tipologia della ceramica Ferroperm Pz27.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Impedenza elettrica d'ingresso dell'elemento piezoelettrico nel modo thickness a vuoto.}
+    \label{fig:impedenza_thickness_vuoto}
+\end{figure}
+
+Come è possibile osservare l'impedenza ha un minimo del modulo alla frequenza di antirisonanza ovvero per $f_a = 970\,\text{kHz}$ e un massimo del modulo alla frequenza di risonanza ovvero per $f_r = 1076\,\text{kHz}$; è inoltre possibile osservare come per frequenze basse, ovvero sufficientemente piccole rispetto alla $f_r$, ad esempio pari a $f_{low} = 649\,\text{kHz}$ la ceramica presenti un comportamento assimilabile a quello di un condensatore. Questi risultati corrispondono a quanto ci si me aspetta dall'andamento a vuoto di una ceramica piezoelettrica ideale (quindi in totale assenza di rumore esterno e/o carichi).
+
+\section{Modello terminale dell'elemento piezoelettrico nel modo thickness}
+\label{sec:modello_terminale}
+
+Il modello ricavato considerando l'elemento isolato meccanicamente permette di mettere in evidenza il comportamento meccanico ed elettrico e di capire come possono essere valutati, tramite delle misure elettriche e meccaniche, alcune delle costanti del materiale. Per analizzare invece il comportamento della ceramica piezoelettrica come trasduttore bisogna imporre delle condizioni al contorno che tengano conto che l'elemento è a contatto, tramite le superfici ortogonali all'asse $z$, con dei mezzi materiali con i quali scambia energia.
+
+È possibile dimostrare che il comportamento della ceramica è schematizzabile da un sistema di equazioni, che utilizzando la notazione matriciale si presenta come segue:
+\begin{equation}
+    \boldsymbol{F} = \boldsymbol{A} \cdot \boldsymbol{v}
+    \label{eq:sistema_A}
+\end{equation}
+Dove:
+\begin{equation}
+    \boldsymbol{F} = \begin{bmatrix} F_1 \\ F_2 \\ V \end{bmatrix}, \quad
+    \boldsymbol{A} = \begin{bmatrix}
+        \frac{Z_0^D}{j\tan(kl)} & \frac{Z_0^D}{j\sin(kl)} & \frac{h_{33}}{j\omega} \\
+        \frac{Z_0^D}{j\sin(kl)} & \frac{Z_0^D}{j\tan(kl)} & \frac{h_{33}}{j\omega} \\
+        \frac{h_{33}}{j\omega} & \frac{h_{33}}{j\omega} & \frac{1}{j\omega C_0}
+    \end{bmatrix}, \quad
+    \boldsymbol{v} = \begin{bmatrix} v_1 \\ v_2 \\ I \end{bmatrix}
+    \label{eq:matrice_A}
+\end{equation}
+dove si è indicato con $Z_0^D = wL v \rho$ l'impedenza acustica dell'elemento in direzione $z$, e con $k = \omega/v$ è il numero d'onda acustico del modo di spessore. Dalla precedente definizione risulta evidente che la matrice $\boldsymbol{A}$ è simmetrica e i suoi elementi sono immaginari puri; si può notare inoltre che: $A_{11} = A_{22}$ e $A_{13} = A_{23}$.
+
+L'elemento piezoelettrico può essere quindi schematizzato come un 3-bipolo, con due porte meccaniche ed una elettrica. Chiudendo le tre porte su bipoli elettrici o meccanici (attivi o passivi), si può caratterizzare il comportamento in frequenza dell'elemento piezoceramico come trasduttore, calcolando tutte le possibili funzioni di trasferimento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/placeholder.jpg}
+    \caption{L'elemento piezoelettrico schematizzato come un 3-bipolo.}
+    \label{fig:3bipolo}
+\end{figure}
+
+Supponendo che le onde elastiche irradiate dalle pareti della ceramica siano onde piane; ciò è verificato con buona approssimazione lontano dall'elemento. Le onde piane sono costituite da un'onda progressiva e un'onda retrograda (riflessa). Se il mezzo in cui l'onda si propaga è non limitato e senza ostacoli, come si suppone, non vi è onda riflessa. In queste condizioni risulta:
+\begin{equation}
+    \begin{aligned}
+        F_1 &= -Z_1 v_1 \\
+        F_2 &= -Z_2 v_2
+    \end{aligned}
+    \label{eq:carichi_acustici}
+\end{equation}
+Dove $Z_1 = w L z_1$ e $Z_2 = w L z_2$ sono le impedenze acustiche dei mezzi 1 e 2 viste dalla ceramica, che sono definite come il prodotto fra l'area della superficie radiante e le impedenze acustiche specifiche $z_1 = \rho_1 v_1$ e $z_2 = \rho_2 v_2$, dove $\rho_i$ e $v_i$ sono la densità e la velocità di propagazione dell'onda nel mezzo $i$. Nelle equazioni precedenti il segno meno è dovuto alla scelta fatta per i versi delle forze e delle velocità.
+
+Sostituendo la prima equazione del set precedente nel sistema di equazioni \cref{eq:matrice_A} è possibile ottenere il seguente sistema di equazioni, anch'esso espresso in forma matriciale:
+\begin{equation}
+    \boldsymbol{F} = \boldsymbol{B} \cdot \boldsymbol{v}
+    \label{eq:sistema_B}
+\end{equation}
+dove:
+\begin{equation}
+    \boldsymbol{F} = \begin{bmatrix} F_2 \\ V \end{bmatrix}, \quad
+    \boldsymbol{B} = \begin{bmatrix}
+        A_{11} - \frac{A_{12}^2}{Z_1 + A_{11}} & A_{13} - \frac{A_{12}A_{13}}{Z_1 + A_{11}} \\
+        A_{13} - \frac{A_{13}A_{12}}{Z_1 + A_{11}} & A_{33} - \frac{A_{13}^2}{Z_1 + A_{11}}
+    \end{bmatrix}, \quad
+    \boldsymbol{v} = \begin{bmatrix} v_2 \\ I \end{bmatrix}
+    \label{eq:matrice_B}
+\end{equation}
+e inoltre anche la matrice $\boldsymbol{B}$ è simmetrica dato che $B_{12} = B_{21}$.
+
+È possibile dimostrare che con il sistema matriciale modellato e con le condizioni di carico acustico imposte, l'impedenza elettrica d'ingresso dell'elemento piezoceramico sarà:
+\begin{equation}
+    Z_{in} = B_{22} - \frac{B_{12}^2}{Z_2 + B_{11}}
+    \label{eq:Zin_con_carico}
+\end{equation}
+dove il fatto che come carico si sia considerato il secondo materiale è dovuto al fatto che è stata sostituita la prima delle \cref{eq:carichi_acustici} nei passaggi precedenti.
+
+Si definisce la funzione di trasferimento in trasmissione (abbreviata in FTT) dell'elemento ceramico, quando alla porta elettrica è applicato un generatore di tensione V:
+\begin{equation}
+    \text{FTT} = \frac{Z_2 B_{12}}{B_{22}(B_{11} + Z_2) - B_{12}^2}
+    \label{eq:FTT_definizione}
+\end{equation}
+
+Data la generalità della trattazione, la funzione di trasferimento in trasmissione, calcolata con riferimento alla porta 2, può essere calcolata in modo analogo con riferimento alla porta 1. In particolare, se $Z_1 = Z_2$, la FTT per la porta 1 ha la stessa espressione della \cref{eq:FTT_definizione}.
+
+Come è possibile osservare le \cref{eq:Zin_con_carico,eq:FTT_definizione} presentano soltanto parametri noti della ceramica o calcolabili con le \cref{eq:matrice_A,eq:matrice_B}; di conseguenza data la precedente base teorica l'implementazione atta a simulare numericamente il comportamento della funzione $Z_{in}$ e della $\text{FTT}$ risulta banale. Inoltre l'implementazione segue pedissequamente quanto visto teoricamente e non presenta scelte implementative degne di essere trattate.
+
+Di seguito vengono riportati i grafici di modulo e fase dell'impedenza di ingresso e della funzione di trasferimento in trasmissione della solita ceramica piezoelettrica. Tali grafici sono stati prodotti per le seguenti situazioni:
+\begin{itemize}
+    \item Mezzi diversi (aria $\rightarrow$ acqua);
+    \item Mezzi uguali (aria $\rightarrow$ aria e acqua $\rightarrow$ acqua).
+\end{itemize}
+Sono stati usati i casi aria--acqua, aria--aria e acqua--acqua per evidenziare rispettivamente asimmetria del carico, limite free--free e limite heavy-loaded.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Impedenza elettrica d'ingresso dell'elemento piezoelettrico nel modo thickness con carichi aria-acqua.}
+    \label{fig:Zin_aria_acqua}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Funzioni di trasferimento in trasmissione dell'elemento piezoelettrico nel modo thickness con carichi aria-acqua.}
+    \label{fig:FTT_aria_acqua}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso dell'elemento piezoelettrico nel modo thickness con ambo i carichi aria e con entrambi i carichi acqua.}
+    \label{fig:Zin_aria_aria_vs_acqua_acqua}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione dell'elemento piezoelettrico nel modo thickness con ambo i carichi aria e con entrambi i carichi acqua.}
+    \label{fig:FTT_aria_aria_vs_acqua_acqua}
+\end{figure}
+
+Variando il mezzo di trasmissione si modifica il carico acustico applicato alla ceramica: con doppia acqua si hanno smorzamenti maggiori e allargamento dei picchi (TTF più efficiente), mentre in doppia aria i picchi sono stretti e pronunciati. Questi risultati corrispondono esattamente a quanto ci si aspetta dato che l'acqua ha una impedenza acustica decisamente maggiore dell'aria. Quest'ultima ha in realtà una impedenza acustica talmente bassa da risultare una buona approssimazione del caso a vuoto.
+
+\section{Estensione del modello terminale ad una coppia di ceramiche piezoelettriche}
+\label{sec:coppia_ceramiche}
+
+La rappresentazione della ceramica piezoelettrica tramite una rete 3-porte, modellata dalla notazione di tipo matriciale precedente, permette di estendere facilmente il modello monodimensionale a coppie di ceramiche. Ciò è di grande utilità in quanto, nella realizzazione pratica dei trasduttori ultrasonici, spesso, si affiancano ceramiche piezoelettriche poste in parallelo rispetto alla tensione di eccitazione $V$. Una tale configurazione consente di diminuire l'impedenza d'ingresso rispetto ad una struttura realizzata con una sola ceramica ottenendo un miglioramento nel pilotaggio del trasduttore. Considerando un pacchetto di piezoceramiche composto da due ceramiche a cui è applicata la stessa tensione di eccitazione come nella seguente figura:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/placeholder.jpg}
+    \caption{Coppia di ceramiche piezoelettriche eccitate dalla stessa tensione V.}
+    \label{fig:coppia_eccitata}
+\end{figure}
+
+Entrambe le ceramiche possono essere schematizzate come reti 3-porte, e tali reti possono essere accorpate in una unica rete 3-porte equivalente, come mostrato nella figura seguente:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/placeholder.jpg}
+    \caption{Coppia di ceramiche piezoelettriche, schematizzazione con reti 3-porte.}
+    \label{fig:schematizzazione_coppia}
+\end{figure}
+
+Il sistema di equazioni che modella la rete 3-porte equivalente è il seguente:
+\begin{equation}
+    \boldsymbol{F} = \boldsymbol{G} \cdot \boldsymbol{v}
+    \label{eq:sistema_G}
+\end{equation}
+dove:
+\begin{equation}
+    \boldsymbol{F} = \begin{bmatrix} F_1 \\ F_4 \\ V \end{bmatrix}, \quad
+    \boldsymbol{G} = \begin{bmatrix}
+        g_{11} & g_{12} & g_{13} \\
+        g_{21} & g_{22} & g_{23} \\
+        g_{31} & g_{32} & g_{33}
+    \end{bmatrix}, \quad
+    \boldsymbol{v} = \begin{bmatrix} v_1 \\ v_4 \\ I \end{bmatrix}
+    \label{eq:matrice_G}
+\end{equation}
+e i coefficienti della matrice $\boldsymbol{G}$ sono così definiti:
+\begin{equation}
+    \begin{aligned}
+        g_{11} &= a_{11} - \frac{a_{12}^2}{a_{11} + b_{11}} \\
+        g_{12} &= \frac{a_{12} b_{12}}{a_{11} + b_{11}} \\
+        g_{13} &= \left( a_{13} - \frac{a_{12} a_{13}}{a_{11} + b_{11}} + \frac{a_{12} b_{13}}{a_{11} + b_{11}} \right) / 2 \\
+        g_{21} &= g_{12} \\
+        g_{22} &= b_{11} - \frac{b_{12}^2}{a_{11} + b_{11}} \\
+        g_{23} &= \left( b_{13} - \frac{b_{12} b_{13}}{a_{11} + b_{11}} + \frac{a_{13} b_{12}}{a_{11} + b_{11}} \right) / 2 \\
+        g_{31} &= g_{13} \\
+        g_{32} &= g_{23} \\
+        g_{33} &= \left( \frac{a_{33}}{2} + \frac{b_{33}}{2} - \frac{b_{13}^2}{2(a_{11} + b_{11})} - \frac{a_{13}^2}{2(a_{11} + b_{11})} + \frac{a_{13} b_{13}}{a_{11} + b_{11}} \right) / 2
+    \end{aligned}
+    \label{eq:coeff_G}
+\end{equation}
+
+Nelle equazioni precedenti i termini $a_{ii}$ e $b_{ii}$ con $i=1,2,3$ sono rispettivamente i coefficienti delle matrici $\boldsymbol{A}$ della prima e della seconda rete 3-porte. È importante notare che i termini $b$ qui non c'entrano nulla con i coefficienti della matrice $\boldsymbol{B}$ introdotta nel paragrafo precedente.
+
+Come è possibile osservare \cref{eq:matrice_G} presenta soltanto parametri noti o calcolabili delle ceramiche. Grazie ad essa è possibile ottenere una matrice riassuntiva del comportamento di entrambe le ceramiche e con essa calcolare $Z_{in}$ e $\text{FTT}$ di tutto il sistema, così come è stato fatto nel paragrafo precedente per una singola ceramica. In questo caso la matrice $\boldsymbol{G}$ viene usata a guisa della matrice $\boldsymbol{A}$.
+
+In questo caso ci sono diversi dettagli implementativi che risulta interessante trattare. Anzitutto la base teorica che è stata appena discussa è valida per $n$ coppie di ceramiche; infatti gli effetti benefici dell'introduzione di una coppia di ceramiche al posto di una singola ceramica di spessore equivalente posso migliorare ulteriormente all'aumentare delle coppie. Per questo motivo nell'implementazione si permette all'utente di decidere il numero di coppie di ceramiche da metter in parallelo. Dato che l'obiettivo è quello di mantenere costante lo spessore totale della pila affinché non cambi la frequenza di risonanza del sistema, allora:
+\begin{equation}
+    l_{new} = \frac{l}{2^{\#coppie}}, \quad C_{0new} = C_0 \cdot 2^{\#coppie}
+    \label{eq:nuovi_parametri_coppie}
+\end{equation}
+
+A causa di questa ulteriore generalizzazione, nell'implementazione MATLAB viene verificato il numero di coppie selezionate dall'utente, e se questo numero è superiore a 1 (una singola coppia, ovvero due ceramiche) il calcolo della matrice $\boldsymbol{G}$ viene effettuato incrementalmente in un ciclo. In questo modo le coppie vengono accorpate incrementalmente fino ad ottenere una singola matrice $\boldsymbol{G}$ equivalente.
+
+Di seguito vengono riportati i grafici comparativi di modulo e fase dell'impedenza d'ingresso e della funzione di trasferimento in trasmissione della solita ceramica piezoelettrica, usando come mezzo l'aria ad ambo i lati: di una singola ceramica con una coppia di ceramiche; e di una singola ceramica con due coppie di ceramiche.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso di una singola ceramica con una coppia di ceramiche con spessore totale equivalente.}
+    \label{fig:Zin_coppia_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione di una singola ceramica con una coppia di ceramiche con spessore totale equivalente.}
+    \label{fig:FTT_coppia_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso di una singola ceramica con due coppie di ceramiche con spessore totale equivalente.}
+    \label{fig:Zin_coppia_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione di una singola ceramica con due coppie di ceramiche con spessore totale equivalente.}
+    \label{fig:FTT_coppia_2}
+\end{figure}
+
+I due andamenti mettono in evidenza la diminuzione della $Z_{in}$ nel caso di due ceramiche rispetto al caso di una singola ceramica. La medesima lunghezza totale delle due configurazioni, impone uguali frequenze di risonanza elettrica. Graficando gli andamenti della $\text{FTT}$ si è voluto evidenziare l'incremento della larghezza di banda nel caso di due ceramiche piezoelettriche poste in parallelo rispetto alla tensione di eccitazione. Infine graficando le stesse quantità per due coppie di ceramiche si è voluto mostrare come i vantaggi appena discussi siano ulteriormente incrementati. Questi risultati corrispondono esattamente a quanto ci si aspettava e si cercava di ottenere sostituendo una ceramica con $n$ ceramiche di spessore totale equivalente, ovvero ricreando quella che in letteratura è chiamata pila o struttura a sandwich.
+
+\section{Progetto di un trasduttore piezoelettrico a larga banda}
+\label{sec:larga_banda}
+
+Si è visto che l'elemento piezoceramico irradia onde elastiche da entrambe le superfici. In particolare, se $Z_1 = Z_2$, l'intensità di queste onde è uguale. Nella pratica, invece, il trasduttore deve irradiare da una sola superficie in un mezzo solitamente detto carico.
+
+Il mezzo a contatto con l'altra superficie, il \textit{backing}, viene scelto in modo tale da migliorare l'efficienza del trasduttore. Nelle applicazioni di segnale, il backing viene realizzato incollando sulla faccia posteriore della ceramica un volume di materiale fortemente assorbente di sezione uguale alla piastra ceramica, ma di spessore molto maggiore. Il backing è spesso fatto da tungsteno-epossidico, che è una miscela di tungsteno disperso in una matrice epossidica che funge da legante. Essendo il tungsteno un metallo ad alta impedenza acustica, l'impedenza acustica specifica di tutto il materiale risulta essere $z_B = (5, 10)\,\text{MRayl}$. L'effetto principale dell'inserimento del backing è un sensibile allargamento della banda passante a spese della potenza del segnale trasmesso.
+
+La faccia radiante della ceramica non è a contatto diretto con il carico, ma interposto vi è una piastra di materiale piezoelettricamente inerte, il \textit{matching plate}. Il motivo della presenza di questo strato è dovuto fondamentalmente al fatto che l'impedenza specifica della ceramica è alta (circa $35\,\text{MRayl}$), mentre l'impedenza del carico è piccola (aria $400\,\text{Rayl}$, acqua $1.5\,\text{MRayl}$); ciò provoca un disadattamento e di conseguenza un trasferimento di potenza minore di quello che si avrebbe se le impedenze fossero uguali o comunque più vicine. Il valore dell'impedenza di adattamento è compreso tra quello della ceramica e quello del carico, in modo da rendere meno brusca la variazione di impedenza \cite{rathod2020}.
+
+La struttura risultante dall'inserimento di questi due strati è mostrata nella figura sottostante:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/placeholder.jpg}
+    \caption{Schematizzazione trasduttore piezoelettrico a larga banda composto da uno strato assorbente, una ceramica piezoelettrica e una piastra di adattamento d'impedenza a contatto con il carico.}
+    \label{fig:struttura_larga_banda}
+\end{figure}
+
+Lo spessore ottimale del plate è calcolabile come segue:
+\begin{equation}
+    l_p = \frac{\lambda_p}{4}, \quad \lambda_p = \frac{v_p}{f_0}
+    \label{eq:spessore_ottimale_plate}
+\end{equation}
+dove $v_p$ è la velocità di propagazione nel materiale di adattamento e $f_0$ è la frequenza a cui si ha l'adattamento (matching) ed è definita come segue:
+\begin{equation}
+    f_0 = \max\{\text{FTT}\}
+    \label{eq:f0_matching}
+\end{equation}
+
+Mentre l'impedenza acustica specifica del plate è calcolabile come segue:
+\begin{equation}
+    z_p = \sqrt[4]{2 z_L^2 z_c}
+    \label{eq:zp_matching}
+\end{equation}
+dove con $z_L$ si è indicata l'impedenza acustica specifica del carico (Load) e con $z_c$ l'impedenza acustica specifica della ceramica piezoelettrica (Ceramic). Con questa scelta si massimizza la banda passante, anche se si ha un leggero decremento del massimo livello di uscita; questo metodo viene utilizzato in tutte le applicazioni che richiedono bande passanti ampie e piatte.
+
+Ovviamente è possibile, e in alcuni casi necessario, utilizzare due o più matching plate, per permettere una graduale discesa dell'impedenza da $z_c$ a $z_L$.
+
+Plate e Backing possono essere modellati, analogamente a quanto visto in precedenza, come doppi bipoli, che connessi al 3-bipolo piezoelettrico, forniscono il modello matriciale del trasduttore piezoelettrico:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Trasduttore piezoelettrico a larga banda, schematizzazione con reti n-porte.}
+    \label{fig:reti_n_porte_larga_banda}
+\end{figure}
+
+Dal punto di vista del calcolo di $Z_{in}$ della ceramica piezoelettrica, nel caso in cui viene aggiunto tra l'interfaccia destra del piezo e il carico, uno strato di adattamento, è possibile sostituire il carico acustico $Z_2$ con l'impedenza acustica equivalente $Z_{eq}$ vista dalla porta meccanica 2 del piezo, che riassume plate+load.
+
+Per calcolare $Z_{eq}$ è necessario concentrarsi sul sistema plate+load. Quest'ultimo è un sistema puramente meccanico quindi le equazioni che lo descrivono sono ricavabili da quelle che descrivono il piezo, cancellando il fattore di accoppiamento elettromeccanico $h_{33}$:
+\begin{equation}
+    \boldsymbol{F} = \boldsymbol{M} \cdot \boldsymbol{v}
+\end{equation}
+Quindi:
+\begin{equation}
+    \begin{bmatrix} F_3 \\ F_4 \end{bmatrix} = \boldsymbol{M} \begin{bmatrix} v_3 \\ v_4 \end{bmatrix} \Rightarrow
+    \begin{cases} F_3 = M_{11} v_3 + M_{12} v_4 \\ F_4 = M_{21} v_3 + M_{22} v_4 \end{cases}
+\end{equation}
+
+Dove i coefficienti della matrice $\boldsymbol{M}$ sono così definiti:
+\begin{equation}
+    M_{11} = \frac{Z_p}{j \tan(k_p l_p)} = M_{22}; \quad M_{12} = \frac{Z_p}{j \sin(k_p l_p)} = M_{21}; \quad \text{con } Z_p = w L v \rho
+\end{equation}
+
+Terminando la porta 4 con $Z_L = Z_2$:
+\begin{equation}
+    \begin{cases} F_4 = -Z_2 v_4 \\ F_3 = M_{11} v_3 + M_{12} v_4 \\ F_4 = M_{21} v_3 + M_{22} v_4 \end{cases} \Rightarrow
+    v_4 = -\frac{M_{21}}{Z_2 + M_{22}} v_3 \Rightarrow
+    \frac{F_3}{v_3} = M_{11} - \frac{M_{12} M_{21}}{Z_2 + M_{22}}
+\end{equation}
+
+Per definizione, alla porta 3 il sistema plate+load si comporta come una impedenza meccanica $Z_{eq}$ tale che $Z_{eq} = F_3/v_3$. Dato che il plate è simmetrico ($M_{11}=M_{22}$ e $M_{12}=M_{21}$):
+\begin{equation}
+    Z_{eq} = M_{11} - \frac{M_{12}^2}{Z_2 + M_{11}}
+    \label{eq:Zeq_plate}
+\end{equation}
+
+È infine possibile una volta calcolato $Z_{eq}$ utilizzarlo a guisa di $Z_2$ per il calcolo della $Z_{in}$ del sistema:
+\begin{equation}
+    Z_{in} = B_{22} - \frac{B_{12}^2}{Z_{eq} + B_{11}}
+    \label{eq:Zin_con_Zeq}
+\end{equation}
+
+Per calcolare la $\text{FTT}$ totale:
+\begin{equation}
+    \text{FTT} = \frac{F_4}{V} = \frac{F_2}{V} \cdot \frac{F_4}{F_3} = \text{FTT}_{pzt} \cdot \text{FTT}_{plt}
+    \label{eq:FTT_totale}
+\end{equation}
+dove:
+\begin{equation}
+    \text{FTT}_{plt} = \frac{F_4}{F_3} = \frac{Z_2 M_{12}}{M_{11} Z_2 + M_{11}^2 - M_{12}^2}
+\end{equation}
+quindi:
+\begin{equation}
+    \text{FTT} = \frac{B_{12} Z_{eq}}{B_{22} Z_{eq} + B_{12} B_{22} - B_{12}^2} \cdot \frac{Z_2 M_{12}}{M_{11} Z_2 + M_{11}^2 - M_{12}^2}
+    \label{eq:FTT_esplicita}
+\end{equation}
+
+Per poter valutare e quantificare l'allargamento di banda introdotto nel sistema dall'aggiunta prima del backing e poi del plate si è utilizzato il seguente indice:
+\begin{equation}
+    \text{FBW}_{\#\text{dB}} = \frac{f_{h\#\text{dB}} - f_{l\#\text{dB}}}{f_{c\#\text{dB}}}
+    \label{eq:FBW}
+\end{equation}
+dove i termini sono definiti come:
+\begin{equation}
+    \begin{aligned}
+        f_{h\#\text{dB}} &= \min\{f : \text{FTT}(f) < \text{FTT}(f_r) - \#\text{dB} \text{ e } f > f_r\} \\
+        f_{l\#\text{dB}} &= \max\{f : \text{FTT}(f) < \text{FTT}(f_r) - \#\text{dB} \text{ e } f < f_r\} \\
+        f_{c\#\text{dB}} &= \frac{f_{h\#\text{dB}} + f_{l\#\text{dB}}}{2}
+    \end{aligned}
+\end{equation}
+
+Nell'implementazione si è effettuato un ciclo che fa variare $l$ nell'intervallo $[0 + \varepsilon, \lambda/2 - \varepsilon]$ con $\varepsilon = 1 \cdot 10^{-6}$ per trovare lo spessore $l$ ottimale che massimizza la $\text{FBW}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso del sistema con e senza backing.}
+    \label{fig:Zin_con_senza_backing}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione del sistema con e senza backing.}
+    \label{fig:FTT_con_senza_backing}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso del sistema con e senza backing, aggiungendo il plate.}
+    \label{fig:Zin_backing_plate}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione del sistema con e senza backing, aggiungendo il plate.}
+    \label{fig:FTT_backing_plate}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Impedenza elettrica d'ingresso del sistema con backing e con plate avente spessore ottimizzato iterativamente.}
+    \label{fig:Zin_ottimizzata}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Funzione di trasferimento in trasmissione del sistema con backing e con plate avente spessore ottimizzato iterativamente.}
+    \label{fig:FTT_ottimizzata}
+\end{figure}
+
+L'incremento quantificato per la banda frazionaria nei vari casi è il seguente:
+\begin{itemize}
+    \item Senza backing senza plate: $\text{FBW}_{-3\text{dB}} = 3.46\%$, $\text{FBW}_{-6\text{dB}} = 5.99\%$;
+    \item Con backing senza plate: $\text{FBW}_{-3\text{dB}} = 19.67\%$, $\text{FBW}_{-6\text{dB}} = 33.58\%$;
+    \item Senza backing con plate: $\text{FBW}_{-3\text{dB}} = 43.76\%$, $\text{FBW}_{-6\text{dB}} = 52.17\%$;
+    \item Con backing con plate: $\text{FBW}_{-3\text{dB}} = 48.83\%$, $\text{FBW}_{-6\text{dB}} = 60.65\%$;
+    \item Con backing e plate ottimizzato ($l_{plt} = 0.728\,\text{mm}$): $\text{FBW}_{-3\text{dB}} = 49.40\%$, $\text{FBW}_{-6\text{dB}} = 61.17\%$.
+\end{itemize}
+
+\section{Progetto di un trasduttore piezoelettrico ultrasonico Langevin}
+\label{sec:langevin}
+
+Un trasduttore è detto ultrasonico quando opera con onde sonore aventi frequenze maggiori di $20\,\text{kHz}$. Lo standard per un trasduttore ultrasonico come frequenza di lavoro è $f_\omega = 40\,\text{kHz}$.
+
+Un trasduttore piezoelettrico di tipo Langevin nella forma più semplice è composto da un anello di ceramica piezoelettrica, o da una coppia di ceramiche, poste tra due masse metalliche di uguale dimensioni e materiale, dette masse di precarico. L'intera struttura è attraversata da un bullone di serraggio il quale fornirà una precompressione al materiale piezoelettrico.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Elementi costituenti un trasduttore ultrasonico Langevin con due ceramiche (a) e trasduttore ultrasonico Langevin con due ceramiche assemblato (b).}
+    \label{fig:langevin_elementi}
+\end{figure}
+
+I vantaggi di questa struttura a sandwich elementare possono essere così riepilogati:
+\begin{enumerate}
+    \item Possibilità di utilizzare ceramiche aventi spessore ridotto (riduzione costi, elevata capacità e bassa impedenza);
+    \item Precompressione della struttura incrementa il rendimento meccanico;
+    \item Uso di masse metalliche per efficace smaltimento del calore e collegamento di ulteriori elementi metallici.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/placeholder.jpg}
+    \caption{Rappresentazione schematica della struttura a sandwich con due ceramiche e distribuzioni degli spostamenti.}
+    \label{fig:langevin_spostamenti}
+\end{figure}
+
+L'equazione di Langevin a vuoto è:
+\begin{equation}
+    \tan(\theta_c) \tan(\theta_l) = \frac{Z_c}{Z_l}
+    \label{eq:langevin}
+\end{equation}
+dove $\theta_c = \frac{\omega_c}{v_c}$, $\theta_l = \frac{\omega_l}{v_l}$, $Z_c = \rho_c v_c A_c$, $Z_l = \rho_l v_l A_l$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Trasduttore ultrasonico Langevin, schematizzazione con reti n-porte.}
+    \label{fig:langevin_reti_nporte}
+\end{figure}
+
+Esplicitando lo spessore $a$ delle masse di precarico:
+\begin{equation}
+    a = \frac{v_l}{2\pi f_r} \tan^{-1} \left[ \frac{\rho_c v_c}{\rho_l v_l} \cdot \frac{1}{\tan\left(\frac{2\pi f_r c}{v_c}\right)} \right]
+    \label{eq:spessore_masse_langevin}
+\end{equation}
+
+Per far coincidere la frequenza di antirisonanza $f_a$ con la frequenza di lavoro $f_\omega = 40\,\text{kHz}$, si riduce lo spessore delle masse di precarico iterativamente finché $f_a = f_\omega$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa dell'impedenza elettrica d'ingresso del trasduttore ultrasonico Langevin, prima e dopo la correzione dello spessore delle masse di precarico.}
+    \label{fig:Zin_langevin_shift}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Comparativa della funzione di trasferimento in trasmissione del trasduttore ultrasonico Langevin, prima e dopo la correzione dello spessore delle masse di precarico.}
+    \label{fig:FTT_langevin_shift}
+\end{figure}
+
+\section{Progetto di un trasduttore piezoelettrico ultrasonico Langevin con concentratore di velocità}
+\label{sec:langevin_concentratore}
+
+I concentratori di velocità (o trasformatori di velocità) concentrano l'azione del trasduttore in una regione di lavoro ristretta. Nel caso di concentratore a gradino:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/placeholder.jpg}
+    \caption{Struttura generale di un concentratore di velocità a sezione multipla.}
+    \label{fig:concentratore_sezione_multipla}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/placeholder.jpg}
+    \caption{Struttura generale di un concentratore di velocità a gradino.}
+    \label{fig:concentratore_gradino}
+\end{figure}
+
+Il fattore di amplificazione dello spostamento $M_p$ alla risonanza vale:
+\begin{equation}
+    M_p = N^2 = \frac{S_3}{S_4} \Rightarrow S_4 = \frac{S_3}{M_p}
+    \label{eq:guadagno_concentratore}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Trasduttore ultrasonico Langevin con concentratore di velocità a gradino, schematizzazione con reti n-porte.}
+    \label{fig:langevin_concentratore_reti}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Impedenza elettrica d'ingresso del trasduttore piezoelettrico Langevin con concentratore di velocità a gradino.}
+    \label{fig:Zin_langevin_concentratore}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Funzione di trasferimento in trasmissione del trasduttore piezoelettrico Langevin con concentratore di velocità a gradino.}
+    \label{fig:FTT_langevin_concentratore}
+\end{figure}
+
+\section{Analisi sperimentale e deduzione della tipologia di una ceramica piezoelettrica in MATLAB}
+\label{sec:deduzione_ceramica}
+
+Data una ceramica non nota, l'obiettivo è dedurre la tipologia basandosi su misurazioni fisiche: massa $m$, dimensioni (raggio $r$, spessore $l$), e impedenza $Z_{in}$.
+
+I parametri da stimare sono $\rho, c_{33}, h_{33}, e_{33}$:
+\begin{equation}
+    \begin{aligned}
+        \rho &= \frac{m}{\pi r^2 l} \\
+        c_{33} &= 4 l^2 f_r^2 \rho \\
+        h_{33} &= \sqrt{\frac{c_{33} \beta_{33} (\theta_s/2)}{\tan(\theta_s/2)}} \\
+        e_{33} &= \frac{h_{33}}{\beta_{33}}
+    \end{aligned}
+    \label{eq:formule_deduzione}
+\end{equation}
+
+Si utilizza la Distanza Euclidea Standardizzata (DES):
+\begin{equation}
+    d_j = \sqrt{\sum_{j \in J} \left( \frac{M_{ij} - p_j}{\sigma_j} \right)^2}
+    \label{eq:DES}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/placeholder.jpg}
+    \caption{Dati acquisiti dall'utente necessari per effettuare la stima della tipologia di ceramica piezoelettrica.}
+    \label{fig:cli_dati_acquisiti}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/placeholder.jpg}
+    \caption{Stima delle tipologie più probabili di ceramiche piezoelettriche.}
+    \label{fig:tabella_stima_ceramiche}
+\end{figure}
+
+\section{Implementazione e interazione con il codice prodotto}
+\label{sec:implementazione_matlab}
+
+Codice suddiviso in due interfacce: CLI (`cli/`) e GUI (`gui/launchMVCApp.m`).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Esempio di interazione con la cli per l'esecuzione della simulazione numerica del trasduttore ultrasonico con concentratore di velocità.}
+    \label{fig:cli_interazione}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Esempio di interazione con la gui per l'esecuzione della simulazione numerica del trasduttore ultrasonico con concentratore di velocità.}
+    \label{fig:gui_interazione}
+\end{figure}

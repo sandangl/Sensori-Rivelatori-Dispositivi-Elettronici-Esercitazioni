@@ -1,0 +1,98 @@
+\chapter*{Appendice}
+\addcontentsline{toc}{chapter}{Appendice}
+\label{chap:appendice}
+
+\section*{Procedura di ottimizzazione dello spessore di una piastra di adattamento}
+
+Se ci si pone come obbiettivo la massimizzazione della banda passante del sistema, sostanzialmente si cerca di massimizzare la sua $\text{FBW}$, ovvero:
+\begin{equation}
+    \max\{\text{FBW}_{\#\text{dB}}\} \Rightarrow \max \left\{ \frac{f_{h\#\text{dB}} - f_{l\#\text{dB}}}{f_{c\#\text{dB}}} \right\}
+    \label{eq:a1_0}
+\end{equation}
+
+Dalla definizione degli elementi della $\text{FBW}_{\#\text{dB}}$ si ricava che la $\text{FBW}_{\#\text{dB}}$ dipende per transitività da $\text{FTT}$ e siccome la $\text{FTT}$ dipende dalla matrice $\boldsymbol{B}$ e dalla matrice $\boldsymbol{M}$, allora:
+\begin{equation}
+    \text{FBW} \xrightarrow{\text{dip}} f_h, f_l, f_c \xrightarrow{\text{dip}} \text{FTT} \xrightarrow{\text{dip}} \boldsymbol{B}, \boldsymbol{M} \Rightarrow \text{FBW}(\boldsymbol{B}, \boldsymbol{M})
+    \label{eq:a1_1}
+\end{equation}
+
+Ricordando la formula estesa del calcolo della $\text{FTT}$ ricavata in precedenza:
+\begin{equation}
+    \text{FTT} = \frac{B_{12} Z_{eq}}{B_{22} Z_{eq} + B_{12} B_{22} - B_{12}^2} \cdot \frac{Z_2 M_{12}}{M_{11} Z_2 + M_{11}^2 - M_{12}^2}
+\end{equation}
+
+È quindi possibile affermare che la $\text{FTT}$ dipende dalla matrice $\boldsymbol{A}$ ($3 \times 3$ del piezo) e quindi $\boldsymbol{B}$ ($2 \times 2$ del piezo ricavata da $\boldsymbol{A}$) le quali dipendono da $\theta_{pzt}$; inoltre la $\text{FTT}$ dipende dalla matrice $\boldsymbol{M}$ ($2 \times 2$ del plate) e da $Z_{eq}$ le quali dipendono $\theta_{plt}$. Ovvero:
+\begin{equation}
+    \text{FTT}(\theta_{pzt}, \theta_{plt})
+    \label{eq:a1_2}
+\end{equation}
+
+Delle due dipendenze quella da $\theta_{pzt}$ può in realtà essere semplificata siccome essa rimane sempre costante dato che lo spessore del piezo non viene mai variato. Quindi:
+\begin{equation}
+    \text{FTT}(\theta_{plt})
+    \label{eq:a1_3}
+\end{equation}
+
+È possibile di conseguenza affermare che la $\text{FTT}$ è periodica rispetto a $\theta_{plt}$. Si procede allora al calcolo della periodicità della $\text{FTT}$, utilizzando la definizione di periodicità (nota: da qui in poi sono stati rimossi i pedici per la $\theta$ per alleggerire la notazione):
+\begin{equation}
+    \text{FTT}(\theta) = H(\theta) \cdot G(\theta)
+    \label{eq:a1_4}
+\end{equation}
+
+Ricordando le seguenti identità trigonometriche:
+\begin{equation}
+    \begin{cases} \tan(\theta + \pi) = \tan(\theta) \\ \sin(\theta + \pi) = \sin(\theta) \end{cases} \Rightarrow
+    \begin{cases} M_{11}(\theta + \pi) = M_{11}(\theta) \\ M_{12}(\theta + \pi) = -M_{12}(\theta) \end{cases}
+    \label{eq:a1_5}
+\end{equation}
+
+Calcolando la periodicità del primo fattore della $\text{FTT}$:
+\begin{equation}
+    Z_{eq}(\theta + \pi) = Z_{eq}(\theta) \text{ e } \cref{eq:a1_5} \Rightarrow H(\theta + \pi) = H(\theta)
+    \label{eq:a1_6}
+\end{equation}
+
+Calcolando la periodicità del secondo fattore della $\text{FTT}$:
+\begin{equation}
+    G(\theta + \pi) = -G(\theta)
+    \label{eq:a1_7}
+\end{equation}
+
+Quindi si ottiene:
+\begin{equation}
+    \text{FTT}(\theta + \pi) = H(\theta + \pi) G(\theta + \pi) = H(\theta) (-G(\theta)) = -\text{FTT}(\theta)
+    \label{eq:a1_8}
+\end{equation}
+Allora:
+\begin{equation}
+    |\text{FTT}(\theta + \pi)| = |\text{FTT}(\theta)|
+    \label{eq:a1_9}
+\end{equation}
+Cioè il modulo della $\text{FTT}$ è periodico di periodicità $\pi$ rispetto a $\theta_{plt}$ ovvero:
+\begin{equation}
+    |\text{FTT}(\theta_{plt})|: \theta_{plt} \in [0, \pi]
+    \label{eq:a1_10}
+\end{equation}
+
+Quindi è possibile far variare $\theta_{plt}$ nel suo periodo e calcolare la $\text{FBW}_{\#\text{dB}}$ in modo da prelevare il $\theta_{plt}$ e quindi lo spessore $l_{plt}$ ottimale per il plate.
+
+Di seguito viene esplicitata la relazione che sussiste tra $\theta_{plt}$ e $l_{plt}$:
+\begin{equation}
+    \begin{cases} \lambda = \frac{v}{f_0} \\ k = \frac{\omega}{v} \end{cases} \Rightarrow
+    \lambda = \frac{2\pi}{k} \Rightarrow
+    \theta = \frac{\omega l}{v} = k l \Rightarrow
+    \theta = \frac{2\pi l}{\lambda}
+    \label{eq:a1_11}
+\end{equation}
+
+Quindi da ciò che è stato ricavato in precedenza implica che:
+\begin{equation}
+    0 \le \theta \le \pi \Rightarrow 0 \le \frac{2\pi l}{\lambda} \le \pi \Rightarrow 0 \le l \le \frac{\lambda}{2}
+    \label{eq:a1_12}
+\end{equation}
+Ovvero:
+\begin{equation}
+    l_{plt} \in [0, \lambda/2] \iff \theta_{plt} \in [0, \pi]
+\end{equation}
+
+Ovvero è possibile far variare $l$ nel suo intervallo $[0, \lambda/2]$ in modo che si è sicuri di prendere e valutare tra tutti i possibili spessori quello che ottimizza la $\text{FBW}$.

@@ -1,0 +1,102 @@
+\chapter{Applicazione e analisi di trasduttori piezoelettrici all'ambito biometrico in MATLAB}
+\label{chap:biometria_matlab}
+
+Dopo aver sviluppato dei modelli numerici dei trasduttori piezoelettrici in MATLAB; e dopo essere passati a una simulazione agli elementi finiti con Ansys; una normale prosecuzione del discorso fatto nei capitoli precedenti è l'applicazione pratica dei concetti studiati e osservati per i trasduttori piezoelettrici a un ambito ingegneristico specifico. L'ambito ingegneristico selezionato è la biometria.
+
+\section{Introduzione alla biometria}
+\label{sec:intro_biometria}
+
+La biometria è la disciplina che analizza e misura caratteristiche fisiche o comportamentali degli individui tramite metodi matematici e statistici. Il termine deriva dal greco \textit{bìos} (vita) e \textit{metros} (misura). Le caratteristiche biometriche possono essere divise in due macro categorie:
+\begin{itemize}
+    \item \textbf{fisiologiche}: ovvero legate alla forma del corpo. Sono grandezze stabili e poco variabili nel tempo. Per tale motivo sono considerate le più affidabili;
+    \item \textbf{comportamentali}: ovvero legate al comportamento di una persona. Sono dinamiche e possono essere influenzate anche da fattori emotivi o temporali.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/placeholder.jpg}
+    \caption{Classificazione dei principali tratti biometrici (tratta da \cite{yang2018}).}
+    \label{fig:tratti_biometrici}
+\end{figure}
+
+Il principio di funzionamento di un sistema di riconoscimento biometrico è basato su tre fasi:
+\begin{enumerate}
+    \item \textbf{Fase di registrazione (Enrollment)}: il sistema rileva le caratteristiche biometriche dell'utente e le memorizza nel database sotto forma di template.
+    \item \textbf{Fase di verifica}: ha l'obiettivo di verificare se un dato individuo è effettivamente colui che dichiara di essere (confronto uno-a-uno).
+    \item \textbf{Fase di identificazione}: si confronta il dato biometrico con tutti quelli presenti nel database (confronto uno-a-molti).
+\end{enumerate}
+
+Gli indici prestazionali principali sono:
+\begin{itemize}
+    \item \textbf{False Acceptance Rate (FAR)}: Percentuale degli score impostor che superano la soglia;
+    \item \textbf{False Rejection Rate (FRR)}: Percentuale degli score genuine che non superano la soglia;
+    \item \textbf{Equal Error Rate (EER)}: Percentuale di errore che si ha quando $\text{FAR} = \text{FRR}$.
+\end{itemize}
+
+\section{Introduzione e valutazione numerica in MATLAB del palm print come caratteristica biometrica di riconoscimento}
+\label{sec:palm_print}
+
+\subsection{Acquisizione}
+\label{subsec:acquisizione}
+
+Le immagini ecografiche sono state ottenute con la tecnica del \textit{pulse-echo imaging}. Il trasduttore ad ultrasuoni utilizzato è una sonda ecografica commerciale costituita da 192 elementi piezoelettrici (LA435 di Esaote S.p.a.), con frequenza centrale di $12\,\text{MHz}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Immagine e schematizzazione del sistema di acquisizione sopra descritto.}
+    \label{fig:sistema_acquisizione_ecografica}
+\end{figure}
+
+Il volume 3D $256 \times 192 \times 250$ viene acquisito muovendo la sonda lungo l'asse $Y$ ottenendo sequenze di B-scan ($XZ$) e C-scan ($XY$).
+
+\subsection{Pre-processing e feature extraction}
+\label{subsec:preprocessing}
+
+La pipeline di elaborazione comprende denoising (Lee/SRAD) ed enhancement (DoG/BH4), seguita da binarizzazione, cleaning, closing, filling, thinning, pruning.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/placeholder.jpg}
+    \caption{Passi di elaborazione di un'immagine per la generazione del template 2D.}
+    \label{fig:passi_elaborazione_template}
+\end{figure}
+
+\subsection{Matching}
+\label{subsec:matching}
+
+Il Matching 2D misura la somiglianza tramite l'operazione di AND logico:
+\begin{equation}
+    \text{SCORE}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n [A(i, j) \land B(i, j)]
+    \label{eq:score_2d}
+\end{equation}
+
+Il Matching 3D estende la formula sui tre assi:
+\begin{equation}
+    \text{SCORE}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n \sum_{z=1}^o [A(i, j, z) \land B(i, j, z)]
+    \label{eq:score_3d}
+\end{equation}
+
+\subsection{Calcolo statistiche e analisi risultati}
+\label{subsec:statistiche}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Occorrenze normalizzate degli score genuini-impostori.}
+    \label{fig:istogramma_scores}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Confronto FAR-FRR con evidenziato l'EER.}
+    \label{fig:far_frr_eer}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Curva DET.}
+    \label{fig:curva_det}
+\end{figure}
