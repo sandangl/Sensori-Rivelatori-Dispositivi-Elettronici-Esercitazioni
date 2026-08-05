@@ -12,7 +12,7 @@ Procediamo alla modellazione ed alla simulazione del trasduttore Langevin precom
 
 \begin{figure}[H]
     \centering
-    \strut\includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \strut\includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Architettura modulare del progetto di simulazione in \textit{Ansys Workbench}.}
     \label{fig:ansys_project_schematic}
 \end{figure}
@@ -21,14 +21,14 @@ Soffermiamoci sulla struttura a blocchi rappresentata in \cref{fig:ansys_project
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Definizione delle proprietà isotrope del Titanio nel modulo \textit{Engineering Data}.}
     \label{fig:ansys_titanio}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Definizione delle proprietà anisotropiche IEEE della ceramica Pz26.}
     \label{fig:ansys_pz26}
 \end{figure}
@@ -37,7 +37,7 @@ Definiamo anzitutto i materiali: assegniamo al Titanio delle masse di precarico 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Geometria solida 3D del trasduttore generata in \textit{DesignModeler}.}
     \label{fig:ansys_geometria_3d}
 \end{figure}
@@ -46,14 +46,14 @@ Inquadriamo quindi la geometria 3D: modelliamo i corpi cilindrici estrudendo lun
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Assegnazione dei materiali e definizione dei domini solutivi nel \textit{Mechanical Model}.}
     \label{fig:ansys_modello_meccanico}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Impostazione manuale dei contatti di superficie di tipo \textit{bonded} (face-to-face).}
     \label{fig:ansys_contatto_bonded}
 \end{figure}
@@ -62,7 +62,7 @@ Per quanto concerne le interconnessioni tra le parti, sostituiamo le connessioni
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Discretizzazione della struttura mediante \textit{mesh} regolare multizona (esaedri e prismi).}
     \label{fig:ansys_mesh}
 \end{figure}
@@ -71,14 +71,14 @@ Generiamo quindi una \textit{mesh} regolare strutturata multizona di tipo hexa/w
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Definizione della \textit{Named Selection} sulla faccia radiante superiore (\textit{right\_extremity}).}
     \label{fig:ansys_named_selection}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Assegnazione dei parametri piezoelettrici alle ceramiche tramite l'oggetto \textit{Piezoelectric Body}.}
     \label{fig:ansys_piezo_body}
 \end{figure}
@@ -87,7 +87,7 @@ Invertiamo il segno dei coefficienti piezoelettrici per una delle due ceramiche 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Visualizzazione della forma modale del modo di vibrazione puramente longitudinale.}
     \label{fig:ansys_modo_longitudinale}
 \end{figure}
@@ -96,7 +96,7 @@ Eseguiamo l'\textbf{analisi modale} nel range $[36, 44]\,\text{kHz}$: identifich
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Applicazione della tensione di eccitazione unitaria sulle facce interne dei dischi piezoceramici.}
     \label{fig:ansys_forzamento_unitario}
 \end{figure}
@@ -105,14 +105,14 @@ Passiamo quindi all'\textbf{analisi armonica}: applichiamo un potenziale nullo a
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Modulo e fase dell'impedenza d'ingresso $Z_{in}$ simulata in Ansys ed esportata in MATLAB.}
     \label{fig:ansys_Zin_langevin}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Risposta in spostamento longitudinale (\textit{displacement}) sulla superficie radiante in funzione della frequenza.}
     \label{fig:ansys_spostamento_langevin}
 \end{figure}
@@ -126,14 +126,14 @@ Estendiamo l'analisi al sistema asimmetrico Langevin provvisto di concentratore 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Geometria tridimensionale 3D del dispositivo asimmetrico completo.}
     \label{fig:ansys_geometria_concentratore}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{\textit{Mesh} multizona ottimizzata per l'intero assieme con concentratore (31292 nodi).}
     \label{fig:ansys_mesh_concentratore}
 \end{figure}
@@ -142,21 +142,21 @@ Impostiamo la dimensione elemento a $0.0021\,\text{m}$ per mantenere il conteggi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Forma modale associata al primo modo longitudinale ($f_r^1 = 21.76\,\text{kHz}$).}
     \label{fig:ansys_modo1_concentratore}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Forma modale associata al secondo modo longitudinale di lavoro ($f_r^2 = 39.09\,\text{kHz}$).}
     \label{fig:ansys_modo2_concentratore}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.75\textwidth]{placeholder.jpg}
     \caption{Forma modale associata al terzo modo longitudinale ($f_r^3 = 56.69\,\text{kHz}$).}
     \label{fig:ansys_modo3_concentratore}
 \end{figure}
@@ -165,14 +165,14 @@ Eseguiamo l'analisi modale nel range $[15, 72]\,\text{kHz}$ ed individuiamo le p
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Andamento di $Z_{in}$ simulato in risposta armonica per il trasduttore con concentratore.}
     \label{fig:ansys_Zin_concentratore}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \includegraphics[width=0.85\textwidth]{placeholder.jpg}
     \caption{Spettro di spostamento in uscita che evidenzia la forte amplificazione alla frequenza di lavoro.}
     \label{fig:ansys_spostamento_concentratore}
 \end{figure}
