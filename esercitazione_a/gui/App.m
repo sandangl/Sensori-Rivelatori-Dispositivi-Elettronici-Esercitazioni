@@ -31,7 +31,7 @@ classdef App < handle
             %% Configurazione layout
 
             obj.Layout = uigridlayout("Parent", obj.Figure);
-            obj.Layout.RowHeight = {'0.65x', 6, '0.35x'};
+            obj.Layout.RowHeight = {'0.65x', 8, '0.35x'};
             obj.Layout.ColumnWidth = {'1x'};
 
             %% Configurazione controlli
@@ -51,9 +51,13 @@ classdef App < handle
             linePanel.Layout.Row = 2;
             linePanel.Layout.Column = [1 3];
             
-            lbl = uilabel(sg, "Text", ":::", "HorizontalAlignment", "center", "VerticalAlignment", "center", "FontColor", [0.6 0.6 0.6], "BackgroundColor", [0.94 0.94 0.94]);
-            lbl.Layout.Row = [1 3];
-            lbl.Layout.Column = 2;
+            gripLayout = uigridlayout(sg, "RowHeight", {'1x', 2, '1x'}, "ColumnWidth", {2, 2, 2, 2, 2}, "Padding", [12, 0, 12, 0], "RowSpacing", 0, "ColumnSpacing", 2, "BackgroundColor", [0.94 0.94 0.94]);
+            gripLayout.Layout.Row = [1 3];
+            gripLayout.Layout.Column = 2;
+            
+            p1 = uipanel(gripLayout, "BackgroundColor", [0.6 0.6 0.6], "BorderType", "none"); p1.Layout.Row = 2; p1.Layout.Column = 1;
+            p2 = uipanel(gripLayout, "BackgroundColor", [0.6 0.6 0.6], "BorderType", "none"); p2.Layout.Row = 2; p2.Layout.Column = 3;
+            p3 = uipanel(gripLayout, "BackgroundColor", [0.6 0.6 0.6], "BorderType", "none"); p3.Layout.Row = 2; p3.Layout.Column = 5;
 
             obj.TabController.App = obj;
 
@@ -116,7 +120,7 @@ classdef App < handle
                 mousePos = obj.Figure.CurrentPoint;
                 figPos = obj.Figure.Position;
                 frac = max(0.05, min(0.95, mousePos(2) / figPos(4)));
-                obj.Layout.RowHeight = {[num2str(1-frac) 'x'], 6, [num2str(frac) 'x']};
+                obj.Layout.RowHeight = {[num2str(1-frac) 'x'], 8, [num2str(frac) 'x']};
             else
                 currObj = obj.Figure.CurrentObject;
                 isSplitter = false;
@@ -169,10 +173,10 @@ classdef App < handle
 
             if isDefault
                 % Collapse: hide controller
-                obj.Layout.RowHeight = {'1x', 6, 0};
+                obj.Layout.RowHeight = {'1x', 8, 0};
+                obj.Controller.Layout.Row = 3;
             else
-                % Restore default (from collapsed or any custom)
-                obj.Layout.RowHeight = {'0.65x', 6, '0.35x'};
+                obj.Layout.RowHeight = {'0.65x', 8, '0.35x'};
             end
         end
     end
