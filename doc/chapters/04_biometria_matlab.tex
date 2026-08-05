@@ -1,102 +1,109 @@
 \chapter{Applicazione e analisi di trasduttori piezoelettrici all'ambito biometrico in MATLAB}
 \label{chap:biometria_matlab}
 
-Dopo aver sviluppato dei modelli numerici dei trasduttori piezoelettrici in MATLAB; e dopo essere passati a una simulazione agli elementi finiti con Ansys; una normale prosecuzione del discorso fatto nei capitoli precedenti è l'applicazione pratica dei concetti studiati e osservati per i trasduttori piezoelettrici a un ambito ingegneristico specifico. L'ambito ingegneristico selezionato è la biometria.
+Completata la modellazione numerica e la validazione FEM tridimensionale dei trasduttori, rivolgiamo ora la nostra attenzione ad un'importante applicazione ingegneristica ad alto valore tecnologico: il \textbf{riconoscimento biometrico ad ultrasuoni} basato sull'elaborazione dell'\textbf{impronta palmare (\textit{palm print})}.
 
 \section{Introduzione alla biometria}
 \label{sec:intro_biometria}
 
-La biometria è la disciplina che analizza e misura caratteristiche fisiche o comportamentali degli individui tramite metodi matematici e statistici. Il termine deriva dal greco \textit{bìos} (vita) e \textit{metros} (misura). Le caratteristiche biometriche possono essere divise in due macro categorie:
+Classifichiamo la biometria come la disciplina scientifica dedicata all'identificazione ed alla verifica dell'identità personale mediante la misurazione quantitativa di tratti fisici o comportamentali. Suddividiamo tali tratti in due macro-categorie:
 \begin{itemize}
-    \item \textbf{fisiologiche}: ovvero legate alla forma del corpo. Sono grandezze stabili e poco variabili nel tempo. Per tale motivo sono considerate le più affidabili;
-    \item \textbf{comportamentali}: ovvero legate al comportamento di una persona. Sono dinamiche e possono essere influenzate anche da fattori emotivi o temporali.
+    \item \textbf{Caratteristiche fisiologiche}: ancorate alla conformazione anatomica del corpo (impronte digitali, iride, geometria della mano, firma vascolare, \textit{palm print}). Mostrano un'elevata stabilità temporale e garantiscono i massimi livelli di affidabilità;
+    \item \textbf{Caratteristiche comportamentali}: legate ad azioni o abitudini individuali (dinamica di digitazione sulla tastiera, grafologia della firma, biometria vocale), le quali risultano tuttavia influenzabili da stati emotivi e fattori contingenti.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.65\textwidth]{assets/placeholder.jpg}
-    \caption{Classificazione dei principali tratti biometrici (tratta da \cite{yang2018}).}
+    \caption{Tassonomia delle principali caratteristiche biometriche fisiologiche e comportamentali (tratta da \cite{yang2018}).}
     \label{fig:tratti_biometrici}
 \end{figure}
 
-Il principio di funzionamento di un sistema di riconoscimento biometrico è basato su tre fasi:
+Formalizziamo l'architettura operativa di un sistema di autenticazione biometrico articolandolo in tre fasi distinte:
 \begin{enumerate}
-    \item \textbf{Fase di registrazione (Enrollment)}: il sistema rileva le caratteristiche biometriche dell'utente e le memorizza nel database sotto forma di template.
-    \item \textbf{Fase di verifica}: ha l'obiettivo di verificare se un dato individuo è effettivamente colui che dichiara di essere (confronto uno-a-uno).
-    \item \textbf{Fase di identificazione}: si confronta il dato biometrico con tutti quelli presenti nel database (confronto uno-a-molti).
+    \item \textbf{Fase di iscrizione (\textit{Enrollment})}: acquisiamo la caratteristica grezza dall'utente ed estraiamo una rappresentazione digitale sintetica ed irreversibile denominata \textit{template};
+    \item \textbf{Fase di verifica (confronto 1:1)}: verifichiamo la corrispondenza tra il nuovo campione acquisito ed il singolo \textit{template} associato all'identità dichiarata dall'utente;
+    \item \textbf{Fase di identificazione (confronto 1:N)}: confrontiamo il campione rilevato con l'intero database di riferimento per stabilire a chi appartenga il dato.
 \end{enumerate}
 
-Gli indici prestazionali principali sono:
+Per valutare quantitativamente la bontà dell'algoritmo di confronto (\textit{matching}), definiamo i tre indici prestazionali statistici di riferimento:
 \begin{itemize}
-    \item \textbf{False Acceptance Rate (FAR)}: Percentuale degli score impostor che superano la soglia;
-    \item \textbf{False Rejection Rate (FRR)}: Percentuale degli score genuine che non superano la soglia;
-    \item \textbf{Equal Error Rate (EER)}: Percentuale di errore che si ha quando $\text{FAR} = \text{FRR}$.
+    \item \textbf{False Acceptance Rate (FAR)}: percentuale di tentativi condotti da soggetti non autorizzati (\textit{impostor}) che superano erroneamente la soglia di decisione;
+    \item \textbf{False Rejection Rate (FRR)}: percentuale di tentativi condotti da utenti legittimi (\textit{genuine}) che vengono ingiustamente respinti;
+    \item \textbf{Equal Error Rate (EER)}: punto di lavoro in corrispondenza del quale le due probabilità d'errore si eguagliano ($\text{FAR} = \text{FRR}$).
 \end{itemize}
 
-\section{Introduzione e valutazione numerica in MATLAB del palm print come caratteristica biometrica di riconoscimento}
+\section{Introduzione e valutazione numerica in MATLAB del \textit{palm print} come caratteristica biometrica di riconoscimento}
 \label{sec:palm_print}
 
-\subsection{Acquisizione}
+\subsection{Acquisizione ultrasonica}
 \label{subsec:acquisizione}
 
-Le immagini ecografiche sono state ottenute con la tecnica del \textit{pulse-echo imaging}. Il trasduttore ad ultrasuoni utilizzato è una sonda ecografica commerciale costituita da 192 elementi piezoelettrici (LA435 di Esaote S.p.a.), con frequenza centrale di $12\,\text{MHz}$.
+Per effettuare l'ispezione sottocutanea del palmo, adottiamo la tecnica di imaging ultrasonico \textit{pulse-echo}. Impieghiamo una sonda ecografica commerciale Esaote LA435 formata da 192 elementi piezoelettrici operanti alla frequenza centrale di $12\,\text{MHz}$, movimentata nello spazio 3D tramite un pantografo CNC pilotato direttamente in ambiente MATLAB.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
-    \caption{Immagine e schematizzazione del sistema di acquisizione sopra descritto.}
+    \caption{Banco di acquisizione ecografica 3D mediante sonda piezoelettrica e sistema robotizzato.}
     \label{fig:sistema_acquisizione_ecografica}
 \end{figure}
 
-Il volume 3D $256 \times 192 \times 250$ viene acquisito muovendo la sonda lungo l'asse $Y$ ottenendo sequenze di B-scan ($XZ$) e C-scan ($XY$).
+Interponiamo tra la cute ed il trasduttore uno strato di acqua d'accoppiamento per minimizzare il disadattamento acustico ed eliminare le riflessioni d'interfaccia. Ricostruiamo il dataset volumetrico completo ($256 \times 192 \times 250$ campioni lungo le direzioni $Z, X, Y$) combinando le scansioni trasversali \textit{B-scan} ($XZ$) e le sezioni in pianta \textit{C-scan} ($XY$).
 
-\subsection{Pre-processing e feature extraction}
+\subsection{Pre-processing ed estrazione delle \textit{feature}}
 \label{subsec:preprocessing}
 
-La pipeline di elaborazione comprende denoising (Lee/SRAD) ed enhancement (DoG/BH4), seguita da binarizzazione, cleaning, closing, filling, thinning, pruning.
+Implementiamo in MATLAB una \textit{pipeline} di elaborazione digitale delle immagini per sopprimere il rumore \textit{speckle} ed esaltare la trama delle rughe e delle linee principali.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{assets/placeholder.jpg}
-    \caption{Passi di elaborazione di un'immagine per la generazione del template 2D.}
+    \caption{Sequenza delle operazioni di pre-processing e scheletrizzazione sul palmo per l'estrazione del \textit{template} 2D.}
     \label{fig:passi_elaborazione_template}
 \end{figure}
 
-\subsection{Matching}
+Appliciamo in sequenza: filtraggio \textit{despeckling} (Lee / SRAD), miglioramento del contrasto mediante filtro \textit{Difference of Gaussians} (DoG) o filtro BH4, binarizzazione adattiva e successive operazioni morfologiche di pulizia, chiusura (\textit{closing}), riempimento (\textit{filling}), scheletrizzazione (\textit{thinning}) e potatura dei rami spuri (\textit{pruning}).
+
+\subsection{Algoritmo di \textit{matching} 2D e 3D}
 \label{subsec:matching}
 
-Il Matching 2D misura la somiglianza tramite l'operazione di AND logico:
+Per valutare il grado di affinità tra due \textit{template} binari $A$ e $B$, formalizziamo lo \textbf{score di similitudine 2D} basato sul rapporto tra l'intersezione logica e l'area totale coperta:
 \begin{equation}
-    \text{SCORE}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n [A(i, j) \land B(i, j)]
+    \text{SCORE}_{2D}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n [A(i, j) \land B(i, j)]
     \label{eq:score_2d}
 \end{equation}
+dove $M_A$ e $M_B$ conteggiano il numero totale di pixel non nulli in ciascun \textit{template}.
 
-Il Matching 3D estende la formula sui tre assi:
+Estendiamo l'algoritmo al volume \textit{3D} incorporando la continuità tra slice consecutive lungo l'asse della profondità $Z$:
 \begin{equation}
-    \text{SCORE}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n \sum_{z=1}^o [A(i, j, z) \land B(i, j, z)]
+    \text{SCORE}_{3D}(A, B) = \frac{2}{M_A + M_B} \sum_{i=1}^m \sum_{j=1}^n \sum_{z=1}^o [A(i, j, z) \land B(i, j, z)]
     \label{eq:score_3d}
 \end{equation}
 
-\subsection{Calcolo statistiche e analisi risultati}
+\subsection{Calcolo statistiche e analisi dei risultati}
 \label{subsec:statistiche}
+
+Valutiamo le prestazioni complessive del sistema biometrico calcolando la distribuzione degli score genuini ed impostori ottenuti su tutte le coppie di confronto.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
-    \caption{Occorrenze normalizzate degli score genuini-impostori.}
+    \caption{Distribuzione sovrapposta degli score per la popolazione dei \textit{genuine} e degli \textit{impostor}.}
     \label{fig:istogramma_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
-    \caption{Confronto FAR-FRR con evidenziato l'EER.}
+    \caption{Andamento delle curve FAR ed FRR in funzione della soglia con evidenziazione del punto di EER.}
     \label{fig:far_frr_eer}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
-    \caption{Curva DET.}
+    \caption{Curva \textit{Detection Error Tradeoff} (DET) del sistema di autenticazione.}
     \label{fig:curva_det}
 \end{figure}
+
+Dall'esame delle curve in \cref{fig:far_frr_eer,fig:curva_det}, evidenziamo la netta separabilità tra le classi ed individuiamo l'ottimo punto di lavoro in corrispondenza del valore di \textbf{Equal Error Rate (EER)}, a conferma dell'efficacia dell'approccio ecografico ad ultrasuoni.
