@@ -29,7 +29,7 @@ classdef App < handle
 
             obj.Layout = uigridlayout("Parent", obj.Figure);
             obj.Layout.RowHeight = "1x";
-            obj.Layout.ColumnWidth = {'0.2x', '0.8x'};
+            obj.Layout.ColumnWidth = {'0.18x', '0.82x'};
 
             %% Configurazione controlli
             obj.TabController = TabController();
