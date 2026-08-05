@@ -1,0 +1,180 @@
+\chapter{Simulazione di trasduttori piezoelettrici in Ansys}
+\label{chap:simulazione_ansys}
+
+Dopo aver formulato i modelli analitici ed eseguito le simulazioni numeriche monodimensionali in ambiente MATLAB, trasferiamo la nostra indagine nel dominio continuo tridimensionale mediante il \textbf{metodo degli elementi finiti (FEM)} implementato nel codice Ansys. Sebbene il modello 1D in MATLAB offra uno strumento di calcolo immediato per cogliere la fisica fondamentale e guidare il dimensionamento teorico delle frequenze di risonanza, esso prescinde inevitabilmente da aspetti geometrici complessi, effetti di bordo, deformazioni trasversali (modi radiali e flessionali) e reali condizioni di vincolo spaziale. L'analisi FEM ci permette dunque di risolvere direttamente le equazioni di campo accoppiate in 3D, validando e raffinando le prestazioni stimate analiticamente.
+
+Per condurre le simulazioni impieghiamo la suite \textit{Ansys Academic Student 2025 R2} avvalendoci dell'estensione ACT \textit{Piezo and MEMS 2020.1}. Quest'ultima consente l'impostazione grafica nativa delle matrici piezoceramiche all'interno di \textit{Workbench}, evitando la scrittura manuale di complessi script APDL. Essendo tuttavia l'estensione 2020.1 ufficialmente deprecata e non pienamente supportata dalla versione 2025 R2, evidenziamo l'insorgere di un \textit{bug} grafico nell'interfaccia di visualizzazione dei risultati di impedenza; illustriamo di seguito l'espediente adottato per aggirare tale anomalia ed esportare correttamente le risposte spettrali.
+
+\section{Simulazione di un trasduttore piezoelettrico ultrasonico Langevin}
+\label{sec:ansys_langevin}
+
+Procediamo alla modellazione ed alla simulazione del trasduttore Langevin precompressi, impostando l'architettura generale del progetto in \textit{Ansys Workbench}.
+
+\begin{figure}[H]
+    \centering
+    \strut\includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Architettura modulare del progetto di simulazione in \textit{Ansys Workbench}.}
+    \label{fig:ansys_project_schematic}
+\end{figure}
+
+Soffermiamoci sulla struttura a blocchi rappresentata in \cref{fig:ansys_project_schematic}: individuiamo i moduli fondamentali dedicati alla definizione dei materiali (\textit{Engineering Data}), alla modellazione solida (\textit{Geometry}), alla discretizzazione ed all'impostazione dei contatti (\textit{Mechanical Model}), fino ad arrivare ai solutori per l'analisi modale (\textit{Modal}) ed armonica (\textit{Harmonic Response}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Definizione delle proprietà isotrope del Titanio nel modulo \textit{Engineering Data}.}
+    \label{fig:ansys_titanio}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Definizione delle proprietà anisotropiche IEEE della ceramica Pz26.}
+    \label{fig:ansys_pz26}
+\end{figure}
+
+Definiamo anzitutto i materiali: assegniamo al Titanio delle masse di precarico un comportamento elastico isotropo ($E$, $\nu$, $\rho$), mentre per la ceramica Pz26 inseriamo la matrice di elasticità anisotropica nel formato standard IEEE (classe di simmetria 6mm) riferita a campo elettrico costante ($c^E$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Geometria solida 3D del trasduttore generata in \textit{DesignModeler}.}
+    \label{fig:ansys_geometria_3d}
+\end{figure}
+
+Inquadriamo quindi la geometria 3D: modelliamo i corpi cilindrici estrudendo lungo l'asse $Z$ i profili trasversali ed effettuando opportune proiezioni di piani per partizionare le facce. Questa scelta garantisce il perfetto allineamento con la direzione di polarizzazione monodimensionale analizzata in MATLAB.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Assegnazione dei materiali e definizione dei domini solutivi nel \textit{Mechanical Model}.}
+    \label{fig:ansys_modello_meccanico}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Impostazione manuale dei contatti di superficie di tipo \textit{bonded} (face-to-face).}
+    \label{fig:ansys_contatto_bonded}
+\end{figure}
+
+Per quanto concerne le interconnessioni tra le parti, sostituiamo le connessioni automatiche \textit{edge-to-edge} create erroneamente dal solutore con contatti manuali di tipo \textit{bonded} (superficie su superficie), garantendo la perfetta continuità cinematica e la trasmissione delle sollecitazioni tra titanio e ceramiche.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Discretizzazione della struttura mediante \textit{mesh} regolare multizona (esaedri e prismi).}
+    \label{fig:ansys_mesh}
+\end{figure}
+
+Generiamo quindi una \textit{mesh} regolare strutturata multizona di tipo hexa/wedge imponendo la dimensione massima dell'elemento a $0.00163\,\text{m}$. Questa impostazione ci consente di raggiungere ben 31908 nodi, saturando quasi perfettamente il limite massimo di 32000 nodi concesso dalla licenza studentesca per garantire la massima accuratezza numerica.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Definizione della \textit{Named Selection} sulla faccia radiante superiore (\textit{right\_extremity}).}
+    \label{fig:ansys_named_selection}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Assegnazione dei parametri piezoelettrici alle ceramiche tramite l'oggetto \textit{Piezoelectric Body}.}
+    \label{fig:ansys_piezo_body}
+\end{figure}
+
+Invertiamo il segno dei coefficienti piezoelettrici per una delle due ceramiche così da modellare la polarizzazione opposta della coppia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Visualizzazione della forma modale del modo di vibrazione puramente longitudinale.}
+    \label{fig:ansys_modo_longitudinale}
+\end{figure}
+
+Eseguiamo l'\textbf{analisi modale} nel range $[36, 44]\,\text{kHz}$: identifichiamo con chiarezza la presenza di un modo di vibrazione puramente longitudinale alla frequenza $f_r = 39257\,\text{Hz}$, caratterizzato da massima deformazione alle estremità e nodo nullo al centro.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Applicazione della tensione di eccitazione unitaria sulle facce interne dei dischi piezoceramici.}
+    \label{fig:ansys_forzamento_unitario}
+\end{figure}
+
+Passiamo quindi all'\textbf{analisi armonica}: applichiamo un potenziale nullo alle facce esterne ed una tensione unitaria $V=1\,\text{V}$ all'interfaccia centrale, impostando 400 intervalli solutivi (\textit{solution intervals}) nell'intervallo $[36, 44]\,\text{kHz}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Modulo e fase dell'impedenza d'ingresso $Z_{in}$ simulata in Ansys ed esportata in MATLAB.}
+    \label{fig:ansys_Zin_langevin}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Risposta in spostamento longitudinale (\textit{displacement}) sulla superficie radiante in funzione della frequenza.}
+    \label{fig:ansys_spostamento_langevin}
+\end{figure}
+
+Per superare l'incompatibilità grafica di Ansys, esportiamo direttamente i dati grezzi in formato testo per riplotarli in MATLAB: osserviamo come la frequenza di antirisonanza $f_a = 38.8\,\text{kHz}$ coincida con il picco di massimo spostamento elastico, confermando l'ottimo accordo con la specifica teorica di $40\,\text{kHz}$ stimata in MATLAB.
+
+\section{Simulazione di un trasduttore piezoelettrico ultrasonico Langevin con concentratore di velocità}
+\label{sec:ansys_langevin_concentratore}
+
+Estendiamo l'analisi al sistema asimmetrico Langevin provvisto di concentratore a gradino (\textit{stepped horn}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Geometria tridimensionale 3D del dispositivo asimmetrico completo.}
+    \label{fig:ansys_geometria_concentratore}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{\textit{Mesh} multizona ottimizzata per l'intero assieme con concentratore (31292 nodi).}
+    \label{fig:ansys_mesh_concentratore}
+\end{figure}
+
+Impostiamo la dimensione elemento a $0.0021\,\text{m}$ per mantenere il conteggio nodale entro il limite di licenza (31292 nodi).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Forma modale associata al primo modo longitudinale ($f_r^1 = 21.76\,\text{kHz}$).}
+    \label{fig:ansys_modo1_concentratore}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Forma modale associata al secondo modo longitudinale di lavoro ($f_r^2 = 39.09\,\text{kHz}$).}
+    \label{fig:ansys_modo2_concentratore}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/placeholder.jpg}
+    \caption{Forma modale associata al terzo modo longitudinale ($f_r^3 = 56.69\,\text{kHz}$).}
+    \label{fig:ansys_modo3_concentratore}
+\end{figure}
+
+Eseguiamo l'analisi modale nel range $[15, 72]\,\text{kHz}$ ed individuiamo le prime tre risonanze longitudinali a $21.76\,\text{kHz}$, $39.09\,\text{kHz}$ e $56.69\,\text{kHz}$, che rispecchiano fedelmente i valori calcolati in MATLAB ($22.16\,\text{kHz}$, $40.14\,\text{kHz}$, $57.94\,\text{kHz}$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Andamento di $Z_{in}$ simulato in risposta armonica per il trasduttore con concentratore.}
+    \label{fig:ansys_Zin_concentratore}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/placeholder.jpg}
+    \caption{Spettro di spostamento in uscita che evidenzia la forte amplificazione alla frequenza di lavoro.}
+    \label{fig:ansys_spostamento_concentratore}
+\end{figure}
+
+Confrontando le risposte, confermiamo che il concentratore trasforma l'input a bassa velocità del piezo in un elevato spostamento meccanico sull'estremità ridotta, validando completamente l'approccio progettuale condotto.

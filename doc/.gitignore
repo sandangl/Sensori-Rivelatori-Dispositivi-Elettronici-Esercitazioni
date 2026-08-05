@@ -1,0 +1,10 @@
+*.aux
+*.*_latexmk
+*.fls
+*.log
+*.out
+*.gz
+*toc
+main.pdf
+*.synctex*
+/src/main.pdf

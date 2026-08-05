@@ -1,0 +1,27 @@
+\documentclass[12pt, a4paper]{report}
+
+\input{preamble.tex}
+
+\begin{document}
+
+\input{frontespizio.tex}
+
+\cleardoublepage
+\pagenumbering{roman}
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\input{chapters/01_introduzione.tex}
+\input{chapters/02_trasduttori_matlab.tex}
+\input{chapters/03_simulazione_ansys.tex}
+\input{chapters/04_biometria_matlab.tex}
+\input{chapters/05_appendice.tex}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Riferimenti}
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
