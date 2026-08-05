@@ -51,7 +51,7 @@ classdef App < handle
             linePanel.Layout.Row = 2;
             linePanel.Layout.Column = [1 3];
             
-            lbl = uilabel(sg, "Text", "⣿", "HorizontalAlignment", "center", "VerticalAlignment", "center", "FontColor", [0.6 0.6 0.6], "BackgroundColor", [0.94 0.94 0.94]);
+            lbl = uilabel(sg, "Text", ":::", "HorizontalAlignment", "center", "VerticalAlignment", "center", "FontColor", [0.6 0.6 0.6], "BackgroundColor", [0.94 0.94 0.94]);
             lbl.Layout.Row = [1 3];
             lbl.Layout.Column = 2;
 
@@ -101,8 +101,13 @@ classdef App < handle
             end
             
             if isSplitter
-                obj.IsDragging = true;
-                obj.Figure.Pointer = 'top';
+                if strcmp(obj.Figure.SelectionType, 'open')
+                    % Double-click: toggle layout
+                    obj.toggleSplitLayout();
+                else
+                    obj.IsDragging = true;
+                    obj.Figure.Pointer = 'top';
+                end
             end
         end
 
@@ -139,6 +144,35 @@ classdef App < handle
             if obj.IsDragging
                 obj.IsDragging = false;
                 obj.Figure.Pointer = 'arrow';
+            end
+        end
+
+        function toggleSplitLayout(obj)
+            % Parse current plot row height
+            plotH = obj.Layout.RowHeight{1};
+            ctrlH = obj.Layout.RowHeight{3};
+
+            if ischar(plotH) || isstring(plotH)
+                plotVal = str2double(strrep(plotH, 'x', ''));
+            else
+                plotVal = plotH;
+            end
+
+            if ischar(ctrlH) || isstring(ctrlH)
+                ctrlVal = str2double(strrep(ctrlH, 'x', ''));
+            else
+                ctrlVal = ctrlH;
+            end
+
+            isDefault = abs(plotVal - 0.65) < 0.02 && abs(ctrlVal - 0.35) < 0.02;
+            isCollapsed = ctrlVal < 0.01 || (isnumeric(ctrlH) && ctrlH == 0);
+
+            if isDefault
+                % Collapse: hide controller
+                obj.Layout.RowHeight = {'1x', 6, 0};
+            else
+                % Restore default (from collapsed or any custom)
+                obj.Layout.RowHeight = {'0.65x', 6, '0.35x'};
             end
         end
     end
