@@ -31,7 +31,7 @@ classdef App < handle
             %% Configurazione layout
 
             obj.Layout = uigridlayout("Parent", obj.Figure);
-            obj.Layout.RowHeight = {'0.75x', 6, '0.25x'};
+            obj.Layout.RowHeight = {'0.65x', 6, '0.35x'};
             obj.Layout.ColumnWidth = {'1x'};
 
             %% Configurazione controlli
