@@ -9,6 +9,9 @@ classdef App < handle
         VistaGrafici(:, 1) PlotView
         Controller(:, 1) Controller
         TabController(:, 1) TabController
+        % ponytail: minimal properties for draggable splitter
+        Splitter(:, 1)
+        IsDragging(1, 1) logical = false
     end
 
     methods
@@ -29,16 +32,37 @@ classdef App < handle
 
             obj.Layout = uigridlayout("Parent", obj.Figure);
             obj.Layout.RowHeight = "1x";
-            obj.Layout.ColumnWidth = {'0.18x', '0.82x'};
+            obj.Layout.ColumnWidth = {'0.18x', 6, '0.82x'};
 
             %% Configurazione controlli
             obj.TabController = TabController();
+            
             obj.Controller = Controller("Parent", obj.Layout);
+            obj.Controller.Layout.Row = 1;
+            obj.Controller.Layout.Column = 1;
+            
+            % ponytail: minimal splitter panel with 8-dot handle and thin line
+            obj.Splitter = uipanel("Parent", obj.Layout, "BorderType", "none", "BackgroundColor", [0.94 0.94 0.94]);
+            obj.Splitter.Layout.Row = 1;
+            obj.Splitter.Layout.Column = 2;
+            
+            sg = uigridlayout(obj.Splitter, "RowHeight", {'1x', 'fit', '1x'}, "ColumnWidth", {'1x', 1, '1x'}, "Padding", 0, "RowSpacing", 0, "ColumnSpacing", 0);
+            
+            linePanel = uipanel(sg, "BorderType", "none", "BackgroundColor", [0.7 0.7 0.7]);
+            linePanel.Layout.Row = [1 3];
+            linePanel.Layout.Column = 2;
+            
+            lbl = uilabel(sg, "Text", "⣿", "HorizontalAlignment", "center", "VerticalAlignment", "center", "FontColor", [0.6 0.6 0.6], "BackgroundColor", [0.94 0.94 0.94]);
+            lbl.Layout.Row = 2;
+            lbl.Layout.Column = [1 3];
+
             obj.TabController.App = obj;
 
             %% Configurazione vista
 
             obj.VistaGrafici = PlotView("Parent", obj.Layout);
+            obj.VistaGrafici.Layout.Row = 1;
+            obj.VistaGrafici.Layout.Column = 3;
 
             %% Dipendenze
             obj.VistaGrafici.App = obj;
@@ -46,6 +70,11 @@ classdef App < handle
             obj.Controller.App = obj;
 
             obj.VistaGrafici.Subscribe();
+
+            % ponytail: mouse tracking for splitter
+            obj.Figure.WindowButtonDownFcn = @obj.onMouseDown;
+            obj.Figure.WindowButtonMotionFcn = @obj.onMouseMove;
+            obj.Figure.WindowButtonUpFcn = @obj.onMouseUp;
 
             obj.Figure.Visible = "on";
         end
@@ -56,6 +85,63 @@ classdef App < handle
 
         function showInfo(obj, message)
             uialert(obj.Figure, message, "Info", "Icon", "info");
+        end
+        
+        function onMouseDown(obj, ~, ~)
+            currObj = obj.Figure.CurrentObject;
+            isSplitter = false;
+            while ~isempty(currObj) && isvalid(currObj)
+                if currObj == obj.Splitter
+                    isSplitter = true;
+                    break;
+                end
+                if isprop(currObj, 'Parent')
+                    currObj = currObj.Parent;
+                else
+                    break;
+                end
+            end
+            
+            if isSplitter
+                obj.IsDragging = true;
+                obj.Figure.Pointer = 'left';
+            end
+        end
+
+        function onMouseMove(obj, ~, ~)
+            if obj.IsDragging
+                mousePos = obj.Figure.CurrentPoint;
+                figPos = obj.Figure.Position;
+                frac = max(0.05, min(0.95, mousePos(1) / figPos(3)));
+                obj.Layout.ColumnWidth = {[num2str(frac) 'x'], 6, [num2str(1-frac) 'x']};
+            else
+                currObj = obj.Figure.CurrentObject;
+                isSplitter = false;
+                while ~isempty(currObj) && isvalid(currObj)
+                    if currObj == obj.Splitter
+                        isSplitter = true;
+                        break;
+                    end
+                    if isprop(currObj, 'Parent')
+                        currObj = currObj.Parent;
+                    else
+                        break;
+                    end
+                end
+                
+                if isSplitter
+                    obj.Figure.Pointer = 'left';
+                else
+                    obj.Figure.Pointer = 'arrow';
+                end
+            end
+        end
+
+        function onMouseUp(obj, ~, ~)
+            if obj.IsDragging
+                obj.IsDragging = false;
+                obj.Figure.Pointer = 'arrow';
+            end
         end
     end
 
